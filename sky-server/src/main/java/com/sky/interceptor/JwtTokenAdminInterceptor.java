@@ -13,6 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 /**
  * jwt令牌校验的拦截器
@@ -27,11 +28,11 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
     /**
      * 校验jwt
      *
-     * @param request
-     * @param response
-     * @param handler
-     * @return
-     * @throws Exception
+     * @param request 请求
+     * @param response 响应
+     * @param handler 处理器
+     * @return 拦截结果
+     * @throws Exception 抛出
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //判断当前拦截到的是Controller的方法还是其他资源
@@ -45,6 +46,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         //2、校验令牌
         try {
+            log.info("==>来自IP:{}的请求", request.getRemoteAddr());
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
@@ -52,9 +54,12 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             log.info("当前操作员工id：{}", empId);
             BaseContext.setCurrentId(empId);
             //3、通过，放行
+            log.info("验证成功");
+            log.info("<==响应：{}", request.getRequestURI());
             return true;
         } catch (Exception ex) {
             //4、不通过，响应401状态码
+            log.info("验证失败");
             response.setStatus(401);
             return false;
         }

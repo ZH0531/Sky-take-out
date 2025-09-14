@@ -112,7 +112,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param id     员工ID
      */
     @Override
-    public void status(Long id, Integer status) {
+    public void setStatus(Long id, Integer status) {
         // 构建需要更新的字段
         Employee employee = Employee.builder()
                 .id(id)
@@ -121,6 +121,37 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .updateUser(BaseContext.getCurrentId())
                 .build();
         // 更新员工数据
+        employeeMapper.update(employee);
+    }
+
+
+    /**
+     * 根据ID查询员工信息
+     * @param id 员工ID
+     * @return 员工信息
+     */
+    @Override
+    public Employee getEmployeeById(Long id) {
+        return employeeMapper.getEmployeeById(id);
+    }
+
+
+    /**
+     * 编辑员工信息
+     * @param employeeDTO 员工信息
+     */
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = Employee.builder()
+                .id(employeeDTO.getId())
+                .username(employeeDTO.getUsername())
+                .name(employeeDTO.getName())
+                .phone(employeeDTO.getPhone())
+                .sex(employeeDTO.getSex())
+                .idNumber(employeeDTO.getIdNumber())
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
         employeeMapper.update(employee);
     }
 }
