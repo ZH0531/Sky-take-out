@@ -9,9 +9,11 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.PasswordEditFailedException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -127,6 +129,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 根据ID查询员工信息
+     *
      * @param id 员工ID
      * @return 员工信息
      */
@@ -135,9 +138,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.getEmployeeById(id);
     }
 
+    /**
+     * 修改员工密码
+     *
+     * @param passwordEditDTO 修改密码信息
+     */
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        // 对传入密码进行MD5加密
+        String newPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes());
+        String oldPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes());
+        // 从线程局部变量获取当前登录用户ID
+        Long empId = BaseContext.getCurrentId();
+        // 获取数据库中的密码进行比对
+        String password = employeeMapper.getEmployeeById(empId).getPassword();
+        // 密码一致/重复/错误
+        if (password.equals(oldPassword) && !password.equals(newPassword)) {
+            Employee employee = Employee.builder()
+                    .id(passwordEditDTO.getEmpId())
+                    .password(newPassword)
+                    .updateTime(LocalDateTime.now())
+                    .updateUser(BaseContext.getCurrentId())
+                    .build();
+            // 修改密码
+            employeeMapper.update(employee);
+        } else if (!password.equals(oldPassword)) {
+            // 密码错误
+            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+        } else {
+            // 新旧密码一致
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_NOT_CHANGE);
+        }
+    }
+
 
     /**
      * 编辑员工信息
+     *
      * @param employeeDTO 员工信息
      */
     @Override
