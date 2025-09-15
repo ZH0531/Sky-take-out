@@ -53,6 +53,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             //设置当前登录用户id
             log.info("当前操作员工id：{}", empId);
             BaseContext.setCurrentId(empId);
+
             //3、通过，放行
             log.info("验证成功");
             log.info("<==响应：{}", request.getRequestURI());

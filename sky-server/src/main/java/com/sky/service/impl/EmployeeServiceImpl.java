@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -44,13 +45,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //1、根据用户名查询数据库中的数据
         Employee employee = employeeMapper.getByUsername(username);
-
         //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
         if (employee == null) {
             //账号不存在
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-
         //密码比对
         //进行md5加密，然后再进行比对
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -58,18 +57,18 @@ public class EmployeeServiceImpl implements EmployeeService {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
-
-        if (employee.getStatus() == StatusConstant.DISABLE) {
+        if (Objects.equals(employee.getStatus(), StatusConstant.DISABLE)) {
             //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
-
         //3、返回实体对象
         return employee;
     }
 
     /**
      * 新增员工
+     *
+     * @param employeeDTO 新增员工数据
      */
     @Override
     public void save(EmployeeDTO employeeDTO) {
@@ -97,6 +96,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    /**
+     * 分页查询
+     *
+     * @param employeePageQueryDTO 分页查询参数
+     * @return 分页结果
+     */
     @Override
     public PageResult page(EmployeePageQueryDTO employeePageQueryDTO) {
         // 开始分页
@@ -108,7 +113,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 启用禁用员工账号
+     * 设置员工账号状态
      *
      * @param status 状态
      * @param id     员工ID
@@ -135,7 +140,9 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public Employee getEmployeeById(Long id) {
-        return employeeMapper.getEmployeeById(id);
+        Employee employee = employeeMapper.getEmployeeById(id);
+        employee.setPassword("****");
+        return employee;
     }
 
     /**
