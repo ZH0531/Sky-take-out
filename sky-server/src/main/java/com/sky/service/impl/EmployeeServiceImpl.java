@@ -83,13 +83,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         // 设置账号状态，创建时间等
         employee.setStatus(StatusConstant.ENABLE);
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
 
         // 添加当前登录用户ID
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
-        BaseContext.removeCurrentId();
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
+//        BaseContext.removeCurrentId();
 
         // 插入数据
         employeeMapper.insert(employee);
@@ -124,8 +124,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = Employee.builder()
                 .id(id)
                 .status(status)
-                .updateTime(LocalDateTime.now())
-                .updateUser(BaseContext.getCurrentId())
+//                .updateTime(LocalDateTime.now())
+//                .updateUser(BaseContext.getCurrentId())
                 .build();
         // 更新员工数据
         employeeMapper.update(employee);
@@ -164,8 +164,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             Employee employee = Employee.builder()
                     .id(passwordEditDTO.getEmpId())
                     .password(newPassword)
-                    .updateTime(LocalDateTime.now())
-                    .updateUser(BaseContext.getCurrentId())
+//                    .updateTime(LocalDateTime.now())
+//                    .updateUser(BaseContext.getCurrentId())
                     .build();
             // 修改密码
             employeeMapper.update(employee);
@@ -193,8 +193,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .phone(employeeDTO.getPhone())
                 .sex(employeeDTO.getSex())
                 .idNumber(employeeDTO.getIdNumber())
-                .updateTime(LocalDateTime.now())
-                .updateUser(BaseContext.getCurrentId())
+//                .updateTime(LocalDateTime.now())
+//                .updateUser(BaseContext.getCurrentId())
                 .build();
         employeeMapper.update(employee);
     }
