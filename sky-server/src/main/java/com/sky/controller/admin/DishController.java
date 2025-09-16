@@ -68,4 +68,15 @@ public class DishController {
      * @return
      */
     // TODO 菜品删除
+
+
+    /**
+     * 菜品起售停售
+     */
+    @PostMapping("/status/{status}")
+    public Result<Void> status(@PathVariable Integer status, Long id) {
+        log.info("菜品id：{}，操作：{}", id, status == 1 ? "启用" : "禁用");
+        dishService.setStatus(status, id);
+        return Result.success();
+    }
 }
