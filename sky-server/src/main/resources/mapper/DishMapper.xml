@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.DishMapper">
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into dish (name, category_id, price, image, description, status, create_time, update_time, create_user,
+                          update_user)
+        values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime},
+                #{createUser}, #{updateUser})
+    </insert>
+    <insert id="saveFlavors">
+        insert into dish_flavor (dish_id, name, value)
+        values
+        <foreach collection="flavors" item="flavor" separator=",">
+            (#{flavor.dishId}, #{flavor.name}, #{flavor.value})
+        </foreach>
+    </insert>
+    <update id="updateDish">
+        update dish
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="categoryId != null">
+                category_id = #{categoryId},
+            </if>
+            <if test="price != null and price != ''">
+                price = #{price},
+            </if>
+            <if test="image != null and image != ''">
+                image = #{image},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <delete id="deleteFlavorsByDishId">
+        delete
+        from dish_flavor
+        where dish_id = #{id}
+    </delete>
+    <select id="pageQuery" resultType="com.sky.vo.DishVO">
+        select dish.*, category.name categoryName
+        from dish left join category on dish.category_id = category.id
+        <where>
+            <if test="name != null and name != ''">
+                and dish.name like concat('%',#{name},'%')
+            </if>
+            <if test="categoryId != null">
+                and dish.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and dish.status = #{status}
+            </if>
+        </where>
+        order by dish.update_time desc
+    </select>
+    <select id="getDishById" resultType="com.sky.vo.DishVO">
+        select dish.id,
+               dish.name,
+               dish.category_id,
+               dish.price,
+               dish.image,
+               dish.description,
+               dish.status,
+               dish.update_time,
+               category.name categoryName
+        from dish
+                 left join category on dish.category_id = category.id
+        where dish.id = #{id}
+    </select>
+    <select id="getFlavorsByDishId" resultType="com.sky.entity.DishFlavor">
+        select *
+        from dish_flavor
+        where dish_id = #{id}
+    </select>
+</mapper>

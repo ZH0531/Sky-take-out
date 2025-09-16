@@ -39,7 +39,6 @@ sky:
     admin-token-name: token
 
   alioss:
-    access-key-id:
-    access-key-secret:
+    region: cn-hangzhou
     bucket-name: zh8888-test
     endpoint: https://oss-cn-hangzhou.aliyuncs.com

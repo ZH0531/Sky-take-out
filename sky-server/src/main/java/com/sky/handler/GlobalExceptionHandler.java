@@ -27,6 +27,11 @@ public class GlobalExceptionHandler {
         return Result.error(ex.getMessage());
     }
 
+    /**
+     * 捕获SQL异常
+     *
+     * @param ms SQL异常
+     */
     @ExceptionHandler
     public Result<String> error(SQLIntegrityConstraintViolationException ms) {
         if (ms.getMessage().contains("Duplicate entry")) {
@@ -36,6 +41,5 @@ public class GlobalExceptionHandler {
         } else {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
-
     }
 }
