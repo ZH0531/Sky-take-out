@@ -51,14 +51,14 @@ public class DishServiceImpl implements DishService {
         // 属性拷贝
         BeanUtils.copyProperties(dishDTO, dish);
         // 插入菜品数据
-        dishMapper.save(dish);
+        dishMapper.insert(dish);
         // 获取菜品的口味数据
         List<DishFlavor> flavors = dishDTO.getFlavors();
         if (flavors != null && !flavors.isEmpty()) {
             // 遍历加上菜品id（id来自useGeneratedKeys="true" keyProperty="id"）
             flavors.forEach(dishFlavor -> dishFlavor.setDishId(dish.getId()));
             // 插入菜品口味数据
-            dishMapper.saveFlavors(flavors);
+            dishMapper.insertFlavors(flavors);
         }
     }
 
@@ -159,7 +159,7 @@ public class DishServiceImpl implements DishService {
             // 遍历加上菜品id
             flavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
             // 插入新的口味数据
-            dishMapper.saveFlavors(flavors);
+            dishMapper.insertFlavors(flavors);
         }
         log.info("插入新的菜品口味数据成功：{}", flavors);
     }

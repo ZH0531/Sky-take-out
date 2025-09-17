@@ -30,12 +30,12 @@ public interface DishMapper {
      * 插入菜品数据
      */
     @AutoFill(OperationType.INSERT)
-    void save(Dish dish);
+    void insert(Dish dish);
 
     /**
      * 批量插入菜品口味数据
      */
-    void saveFlavors(List<DishFlavor> flavors);
+    void insertFlavors(List<DishFlavor> flavors);
 
     /**
      * 根据id查询菜品和口味
