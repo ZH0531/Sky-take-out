@@ -44,9 +44,9 @@ public interface DishMapper {
     void updateDish(Dish dish);
 
     /**
-     * 根据id删除菜品口味
+     * 根据id删除菜品口味(支持批量)
      */
-    void deleteFlavorsByDishId(Long id);
+    void deleteFlavorsByDishId(List<Long> id);
 
     /**
      * 根据id查询菜品
