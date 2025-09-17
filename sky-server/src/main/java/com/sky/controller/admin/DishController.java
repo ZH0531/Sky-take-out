@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -9,6 +10,9 @@ import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -51,7 +55,7 @@ public class DishController {
     }
 
     /**
-     * 根据id查询菜品
+     * 根据菜品id查询菜品
      * @param id 菜品id
      */
     @GetMapping("/{id}")
@@ -63,11 +67,27 @@ public class DishController {
     }
 
     /**
-     * 菜品批量删除
-     * @param ids
-     * @return
+     * 根据分类id查询菜品
+     * @param categoryId 分类id
      */
-    // TODO 菜品删除
+    @GetMapping("/list")
+    public Result<List<Dish>> list(Integer categoryId) {
+        log.info("查询分类id：{}", categoryId);
+        List<Dish> list = dishService.list(Long.valueOf(categoryId));
+        return Result.success(list);
+    }
+
+    /**
+     * 菜品批量删除
+     * @param ids 菜品id
+     */
+    @DeleteMapping
+    public Result<Void> delete(@RequestParam List<Long> ids) {
+        log.info("菜品批量删除：{}", ids);
+        dishService.delete(ids);
+        return Result.success();
+    }
+
 
 
     /**

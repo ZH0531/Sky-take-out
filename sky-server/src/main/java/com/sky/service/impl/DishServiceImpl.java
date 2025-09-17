@@ -95,6 +95,27 @@ public class DishServiceImpl implements DishService {
     }
 
     /**
+     * 获取指定分类下的菜品
+     *
+     * @param id 分类id
+     * @return 菜品列表
+     */
+    @Override
+    public List<Dish> list(Long id) {
+        return dishMapper.list(id);
+    }
+
+    /**
+     * 批量删除菜品
+     *
+     * @param ids 菜品id列表
+     */
+    @Override
+    public void delete(List<Long> ids) {
+        dishMapper.delete(ids);
+    }
+
+    /**
      * 修改菜品
      *
      * @param dishDTO 菜品数据
@@ -127,6 +148,7 @@ public class DishServiceImpl implements DishService {
         dishMapper.deleteFlavorsByDishId(dishDTO.getId());
         // 获取新的口味数据
         List<DishFlavor> flavors = dishDTO.getFlavors();
+        log.info("菜品口味数据：{}", flavors);
         if (flavors != null && !flavors.isEmpty()) {
             // 遍历加上菜品id
             flavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));

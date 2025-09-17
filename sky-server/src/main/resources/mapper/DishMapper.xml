@@ -50,6 +50,14 @@
         from dish_flavor
         where dish_id = #{id}
     </delete>
+    <delete id="delete">
+        delete
+        from dish
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
     <select id="pageQuery" resultType="com.sky.vo.DishVO">
         select dish.*, category.name categoryName
         from dish left join category on dish.category_id = category.id
@@ -84,5 +92,10 @@
         select *
         from dish_flavor
         where dish_id = #{id}
+    </select>
+    <select id="list" resultType="com.sky.entity.Dish">
+        select *
+        from dish
+        where category_id = #{id}
     </select>
 </mapper>
