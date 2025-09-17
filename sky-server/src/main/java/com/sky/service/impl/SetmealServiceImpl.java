@@ -57,4 +57,18 @@ public class SetmealServiceImpl implements SetmealService {
         setmealMapper.insertDish(setmealDTO);
         log.info("插入套餐菜品数据：{}", setmealDishes);
     }
+    
+    /**
+     * 套餐起售停售
+     * @param status 状态
+     * @param id 套餐id
+     */
+    @Override
+    public void setStatus(Integer status, Long id) {
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
+    }
 }

@@ -34,4 +34,13 @@ public class SetmealController {
         setmealService.save(setmealDTO);
         return Result.success();
     }
+
+    /**
+     * 套餐起售停售
+     */
+    @PostMapping("/status/{status}")
+    public Result<Void> status(@PathVariable Integer status, Long id) {
+        setmealService.setStatus(status, id);
+        return Result.success();
+    }
 }
