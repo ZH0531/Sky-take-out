@@ -62,4 +62,18 @@
         </set>
         where id = #{id}
     </update>
+
+    <delete id="delete">
+        delete from setmeal where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteSetmealDishBySetmealIds">
+        delete from setmeal_dish where setmeal_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

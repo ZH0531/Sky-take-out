@@ -128,33 +128,17 @@ public class DishServiceImpl implements DishService {
     @Transactional(rollbackFor = Exception.class)
     public void update(DishDTO dishDTO) {
         // 更新菜品基础信息
-        Dish dish = Dish.builder()
-                .id(dishDTO.getId())
-                .name(dishDTO.getName())
-                .categoryId(dishDTO.getCategoryId())
-                .price(dishDTO.getPrice())
-                .image(dishDTO.getImage())
-                .description(dishDTO.getDescription())
-                .status(dishDTO.getStatus())
-                .build();
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
         dishMapper.updateDish(dish);
         log.info("更新菜品成功");
-        // 更新菜品口味数据
-        updateFlavors(dishDTO);
-        log.info("更新菜品口味成功");
-    }
 
-    /**
-     * 更新菜品口味数据
-     *
-     * @param dishDTO 菜品数据
-     */
-    private void updateFlavors(DishDTO dishDTO) {
-        // 删除当前菜品的口味数据(将单个ID转成列表 以适配批量删除)
+        // 更新菜品口味数据
+        // 删除当前菜品的口味数据
         dishMapper.deleteFlavorsByDishId(Collections.singletonList(dishDTO.getId()));
+
         // 获取新的口味数据
         List<DishFlavor> flavors = dishDTO.getFlavors();
-
         if (flavors != null && !flavors.isEmpty()) {
             // 遍历加上菜品id
             flavors.forEach(dishFlavor -> dishFlavor.setDishId(dishDTO.getId()));
@@ -163,6 +147,8 @@ public class DishServiceImpl implements DishService {
         }
         log.info("插入新的菜品口味数据成功：{}", flavors);
     }
+
+
 
 
 }

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -70,5 +71,60 @@ public class SetmealServiceImpl implements SetmealService {
                 .status(status)
                 .build();
         setmealMapper.update(setmeal);
+    }
+    
+    /**
+     * 根据id查询套餐
+     * @param id 套餐id
+     * @return 套餐VO对象
+     */
+    @Override
+    public SetmealVO getSetmealById(Long id) {
+        // 查询套餐基础数据
+        SetmealVO setmealVO = setmealMapper.getById(id);
+        // 查询套餐菜品关系数据
+        List<SetmealDish> setmealDishes = setmealMapper.getSetmealDishBySetmealId(id);
+        // 设置套餐菜品关系数据
+        setmealVO.setSetmealDishes(setmealDishes);
+        return setmealVO;
+    }
+    
+    /**
+     * 修改套餐
+     * @param setmealDTO 套餐数据
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(SetmealDTO setmealDTO) {
+        // 更新套餐基础信息
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        setmealMapper.update(setmeal);
+        
+        // 更新套餐菜品关系数据 - 全删后插入
+        // 删除当前套餐的菜品关系数据（兼容批量删除）
+        setmealMapper.deleteSetmealDishBySetmealIds(Collections.singletonList(setmealDTO.getId()));
+        
+        // 获取新的套餐菜品关系数据
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        if (setmealDishes != null && !setmealDishes.isEmpty()) {
+            // 设置套餐id
+            setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(setmealDTO.getId()));
+            // 插入新的套餐菜品关系数据
+            setmealMapper.insertDish(setmealDTO);
+        }
+    }
+    
+    /**
+     * 批量删除套餐
+     * @param ids 套餐id列表
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(List<Long> ids) {
+        // 删除套餐
+        setmealMapper.delete(ids);
+        // 删除套餐菜品关系
+        setmealMapper.deleteSetmealDishBySetmealIds(ids);
     }
 }
