@@ -7,11 +7,9 @@ import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.enumeration.OperationType;
-import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -20,11 +18,11 @@ public interface SetmealMapper {
 
     /**
      * 根据分类id查询套餐的数量
-     * @param id 分类id
+     * @param categoryId 分类id
 
      */
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
-    Integer countByCategoryId(Long id);
+    Integer countByCategoryId(Long categoryId);
 
     /**
      * 套餐分页查询
@@ -58,7 +56,7 @@ public interface SetmealMapper {
      * @return 套餐VO对象
      */
     @Select("select * from setmeal where id = #{id}")
-    SetmealVO getById(Long id);
+    SetmealVO getSetmealById(Long id);
     
     /**
      * 根据套餐id查询套餐菜品关系
@@ -79,4 +77,12 @@ public interface SetmealMapper {
      * @param ids 套餐id列表
      */
     void deleteSetmealDishBySetmealIds(List<Long> ids);
+
+    /**
+     * 根据菜品id查询包含该菜品的套餐
+     * @param id 菜品id
+     * @return 套餐列表
+     */
+    @Select("select * from setmeal where id in (select setmeal_id from setmeal_dish where dish_id = #{id})")
+    List<Setmeal> getSetmealByDishId(Long id);
 }

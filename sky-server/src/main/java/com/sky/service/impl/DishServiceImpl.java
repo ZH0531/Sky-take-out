@@ -7,8 +7,10 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
-import com.sky.exception.DishNotFoundException;
+import com.sky.entity.Setmeal;
+import com.sky.exception.*;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -26,6 +28,8 @@ import java.util.List;
 public class DishServiceImpl implements DishService {
     @Autowired
     private DishMapper dishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
 
     /**
@@ -87,6 +91,14 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public void setStatus(Integer status, Long id) {
+        // 已起售套餐内包含该菜品，无法停售
+        if (status == 0) { // 拦截停售菜品操作
+            setmealMapper.getSetmealByDishId(id).forEach(setmeal -> {
+                if (setmeal.getStatus() == 1) {// 套餐已启售 且包含该菜品
+                    throw new DishStopSellingFailedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+                }
+            });
+        }
         Dish dish = Dish.builder()
                 .id(id)
                 .status(status)
@@ -114,6 +126,21 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(List<Long> ids) {
+        // 起售中的菜品不能删除
+        ids.forEach(id -> {
+            DishVO dish = dishMapper.getDishById(id);
+            if (dish.getStatus() == 1) {
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        });
+        // 套餐包含菜品时不能删除
+        ids.forEach(id -> {
+            // 获取包含该菜品的套餐信息
+            List<Setmeal> setmealList = setmealMapper.getSetmealByDishId(id);
+            if (!setmealList.isEmpty()) {
+                throw new DeletionNotAllowedException(MessageConstant.DELETE_DISH_BE_RELATED_BY_SETMEAL);
+            }
+        });
         dishMapper.delete(ids);
         dishMapper.deleteFlavorsByDishId(ids);
         log.info("批量删除菜品口味：{}", ids);
@@ -127,6 +154,11 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(DishDTO dishDTO) {
+        // 获取当前菜品的停售状态
+        DishVO dishVO = dishMapper.getDishById(dishDTO.getId());
+        if (dishVO.getStatus() == 1) {
+            throw new DishChangeFailed(MessageConstant.DISH_CHANGE_FAILED);
+        }
         // 更新菜品基础信息
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -147,8 +179,6 @@ public class DishServiceImpl implements DishService {
         }
         log.info("插入新的菜品口味数据成功：{}", flavors);
     }
-
-
 
 
 }
