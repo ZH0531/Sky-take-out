@@ -46,17 +46,17 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         //2、校验令牌
         try {
-            log.info("==>来自IP:{}的请求:{}->{}", request.getRemoteAddr(), request.getRequestURI(), request.getMethod());
-            log.info("jwt校验:{}", token);
+            log.debug("==>来自IP:{}的请求:{}->{}", request.getRemoteAddr(), request.getRequestURI(), request.getMethod());
+            log.debug("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
             Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
             //设置当前登录用户id
-            log.info("当前操作员工id：{}", empId);
+            log.debug("当前操作员工id：{}", empId);
             BaseContext.setCurrentId(empId);
 
             //3、通过，放行
-            log.info("验证成功");
-            log.info("<==响应给IP:{}:{}->{}", request.getRemoteAddr(), request.getRequestURI(), request.getMethod());
+            log.debug("验证成功");
+            log.debug("<==响应给IP:{}:{}->{}", request.getRemoteAddr(), request.getRequestURI(), request.getMethod());
             return true;
         } catch (Exception ex) {
             //4、不通过，响应401状态码
