@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user/shop")
 @Slf4j
-public class UserShopController {
+public class ShopController_user {
     @Autowired
     private ShopService shopService;
 
+    /**
+     * 获取店铺营业状态
+     */
     @GetMapping("/status")
     public Result<Integer> getStatus() {
         Integer status = shopService.getStatus();
